@@ -2,15 +2,81 @@
 <html lang="uk">
 <head>
 	<meta charset="UTF-8">
-	<title>Аня — учасник команди</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Аня — SINGLETON</title>
 	<link rel="stylesheet" href="style.css">
 </head>
 <body>
-	<div class="container">
-		<h1>Аня</h1>
-		<p><strong>Роль у команді:</strong> учасник команди.</p>
-		<p><em>(Тут можна додати короткий опис обов'язків чи вкладу в проєкт.)</em></p>
-		<a class="back-link" href="index.html">&larr; До списку команди</a>
-	</div>
+
+	<header class="site-header on-dark">
+		<a class="logo" href="index.html">&lsquo;singleton</a>
+		<button class="menu-toggle" type="button">Меню</button>
+	</header>
+
+	<nav class="menu">
+		<button class="menu__close" type="button">Закрити</button>
+		<ul class="menu__list">
+			<li><a href="index.html">Команда</a></li>
+			<li><a href="anya.html">Аня</a></li>
+			<li><a href="artem.html">Артем</a></li>
+			<li><a href="andriy.html">Андрій</a></li>
+			<li><a href="sofiya.html">Софія</a></li>
+			<li><a href="ivan.html">Іван</a></li>
+			<li><a href="dmytro.html">Дмитро</a></li>
+			<li><a href="mykyta.html">Микита</a></li>
+		</ul>
+		<span class="menu__meta mono">SINGLETON &middot; ІП-41 &middot; КПІ ім. Ігоря Сікорського</span>
+	</nav>
+
+	<main>
+		<section class="profile" data-dark>
+			<span class="profile__eyebrow mono">01 / 07 &nbsp;—&nbsp; Команда SINGLETON</span>
+			<h1 class="profile__name">Ан<em>я</em></h1>
+			<p class="profile__role" data-reveal>Учасниця команди SINGLETON — працює над проєктами з дисципліни Spring Framework.</p>
+		</section>
+
+		<section class="details">
+			<div class="detail-row">
+				<span class="detail-row__label mono">Роль</span>
+				<span class="detail-row__value">Учасниця команди</span>
+			</div>
+			<div class="detail-row">
+				<span class="detail-row__label mono">Група</span>
+				<span class="detail-row__value">ІП-41 &middot; ФІОТ</span>
+			</div>
+			<div class="detail-row">
+				<span class="detail-row__label mono">Курс</span>
+				<span class="detail-row__value">3 курс &middot; 2026</span>
+			</div>
+			<div class="detail-row">
+				<span class="detail-row__label mono">Email</span>
+				<span class="detail-row__value"><a href="mailto:Khyzhniak.anna-ip41@edu.kpi.ua">Khyzhniak.anna-ip41@edu.kpi.ua</a></span>
+			</div>
+		</section>
+
+		<p class="note">Сторінку учасника можна доповнити: додати короткий опис обов'язків у команді, напрям роботи над проєктом та посилання на репозиторій.</p>
+
+		<nav class="pager">
+			<a href="mykyta.html">
+				<span class="pager__label mono">&larr; Попередній</span>
+				<span class="pager__name">Микита</span>
+			</a>
+			<a href="artem.html">
+				<span class="pager__label mono">Наступний &rarr;</span>
+				<span class="pager__name">Артем</span>
+			</a>
+		</nav>
+	</main>
+
+	<footer class="site-footer" data-dark>
+		<span class="site-footer__label mono">Say hello</span>
+		<a class="site-footer__cta" href="index.html#team">УСЯ КОМАНДА</a>
+		<div class="site-footer__bottom mono">
+			<span>Команда SINGLETON &middot; ІП-41</span>
+			<a href="/">На головну &rarr;</a>
+		</div>
+	</footer>
+
+	<script src="app.js"></script>
 </body>
 </html>

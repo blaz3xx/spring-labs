@@ -2,18 +2,21 @@
 <html lang="uk">
 <head>
 	<meta charset="UTF-8">
-	<title>Наша команда</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>SINGLETON — команда ІП-41</title>
 	<link rel="stylesheet" href="style.css">
 </head>
 <body>
-	<div class="container">
-		<h1>Наша команда</h1>
-		<p>
-			Ми — команда студентів, що разом виконує лабораторні роботи з дисципліни
-			"Розроблення застосунків з використанням Spring Framework". Нижче — список
-			учасників команди, натисніть на ім'я, щоб дізнатись більше про кожного.
-		</p>
-		<ul class="members">
+
+	<header class="site-header on-dark">
+		<a class="logo" href="index.html">&lsquo;singleton</a>
+		<button class="menu-toggle" type="button">Меню</button>
+	</header>
+
+	<nav class="menu">
+		<button class="menu__close" type="button">Закрити</button>
+		<ul class="menu__list">
+			<li><a href="index.html">Команда</a></li>
 			<li><a href="anya.html">Аня</a></li>
 			<li><a href="artem.html">Артем</a></li>
 			<li><a href="andriy.html">Андрій</a></li>
@@ -22,7 +25,186 @@
 			<li><a href="dmytro.html">Дмитро</a></li>
 			<li><a href="mykyta.html">Микита</a></li>
 		</ul>
-		<a class="back-link" href="/">&larr; На головну</a>
-	</div>
+		<span class="menu__meta mono">SINGLETON &middot; ІП-41 &middot; КПІ ім. Ігоря Сікорського</span>
+	</nav>
+
+	<main>
+		<section class="hero" data-dark>
+			<p class="hero__lead" data-reveal>SINGLETON — команда з семи розробників, що будує застосунки на Spring Framework.</p>
+			<h1 class="hero__mark hero__mark--long"><span class="apos">&lsquo;</span>SINGLETON</h1>
+			<div class="hero__foot mono">
+				<span class="scroll-hint">Прокрутіть <span>&darr;</span></span>
+				<span>Група ІП-41</span>
+			</div>
+		</section>
+
+		<section>
+			<h2 class="section-head" data-rise>Що ми робимо</h2>
+			<div class="services">
+				<article class="service" data-fill="grey">
+					<span class="service__num mono">01</span>
+					<div>
+						<h3 class="service__title">Backend</h3>
+						<p class="service__text">
+							Пишемо серверну частину на Java та Spring Boot: контролери, сервіси,
+							робота з контекстом застосунку й залежностями через IoC-контейнер.
+						</p>
+					</div>
+				</article>
+				<article class="service" data-fill="cream">
+					<span class="service__num mono">02</span>
+					<div>
+						<h3 class="service__title">Web</h3>
+						<p class="service__text">
+							Піднімаємо вбудований Tomcat, віддаємо статику та REST-ендпоїнти,
+							налаштовуємо маршрутизацію запитів у Spring MVC.
+						</p>
+					</div>
+				</article>
+				<article class="service" data-fill="yellow">
+					<span class="service__num mono">03</span>
+					<div>
+						<h3 class="service__title">Інтерфейси</h3>
+						<p class="service__text">
+							Верстаємо сторінки проєкту: типографіка, сітка, адаптивність
+							і акуратні анімації без зайвих бібліотек.
+						</p>
+					</div>
+				</article>
+				<article class="service" data-fill="peri">
+					<span class="service__num mono">04</span>
+					<div>
+						<h3 class="service__title">Інше</h3>
+						<p class="service__text">
+							Розбираємось із збіркою Maven, залежностями, конфігурацією
+							та всім, що потрібно, аби проєкт стартував з однієї команди.
+						</p>
+					</div>
+				</article>
+			</div>
+		</section>
+
+		<section class="brand" data-dark>
+			<svg class="mark" viewBox="0 0 200 200" data-rise role="img" aria-label="Логотип команди SINGLETON: сім бінів, вплетених в один контейнер">
+				<g class="mark__orbit">
+					<circle class="mark__ring" cx="100" cy="100" r="70"/>
+					<line class="mark__wire" style="--i:0" x1="100"   y1="30"    x2="100" y2="100"/>
+					<line class="mark__wire" style="--i:1" x1="154.7" y1="56.4"  x2="100" y2="100"/>
+					<line class="mark__wire" style="--i:2" x1="168.2" y1="115.6" x2="100" y2="100"/>
+					<line class="mark__wire" style="--i:3" x1="130.4" y1="163.1" x2="100" y2="100"/>
+					<line class="mark__wire" style="--i:4" x1="69.6"  y1="163.1" x2="100" y2="100"/>
+					<line class="mark__wire" style="--i:5" x1="31.8"  y1="115.6" x2="100" y2="100"/>
+					<line class="mark__wire" style="--i:6" x1="45.3"  y1="56.4"  x2="100" y2="100"/>
+					<circle class="mark__bean" style="--i:0" cx="100"   cy="30"    r="7"/>
+					<circle class="mark__bean" style="--i:1" cx="154.7" cy="56.4"  r="7"/>
+					<circle class="mark__bean" style="--i:2" cx="168.2" cy="115.6" r="7"/>
+					<circle class="mark__bean" style="--i:3" cx="130.4" cy="163.1" r="7"/>
+					<circle class="mark__bean" style="--i:4" cx="69.6"  cy="163.1" r="7"/>
+					<circle class="mark__bean" style="--i:5" cx="31.8"  cy="115.6" r="7"/>
+					<circle class="mark__bean" style="--i:6" cx="45.3"  cy="56.4"  r="7"/>
+				</g>
+				<circle class="mark__halo" cx="100" cy="100" r="17"/>
+				<circle class="mark__core" cx="100" cy="100" r="17"/>
+			</svg>
+
+			<h2 class="brand__word" data-rise>
+				<span>S</span><span>I</span><span>N</span><span>G</span><span>L</span><span>E</span><span>T</span><span>O</span><span>N</span>
+			</h2>
+			<p class="brand__text" data-rise>
+				Сім розробників — один інстанс. У Spring singleton означає єдиний
+				екземпляр біна на весь контейнер: скільки б компонентів його не просили,
+				він лишається одним. Так само працює й наша команда.
+			</p>
+		</section>
+
+		<section class="team" id="team">
+			<h2 class="section-head" data-rise>Наша команда</h2>
+
+			<a class="member-link" href="anya.html">
+				<span class="member-link__row">
+					<span class="member-link__name">Ан<em>я</em></span>
+					<span class="member-link__meta mono">01 &nbsp;/&nbsp; Учасниця</span>
+				</span>
+			</a>
+			<a class="member-link" href="artem.html">
+				<span class="member-link__row">
+					<span class="member-link__name">Ар<em>тем</em></span>
+					<span class="member-link__meta mono">02 &nbsp;/&nbsp; Учасник</span>
+				</span>
+			</a>
+			<a class="member-link" href="andriy.html">
+				<span class="member-link__row">
+					<span class="member-link__name">Ан<em>дрій</em></span>
+					<span class="member-link__meta mono">03 &nbsp;/&nbsp; Учасник</span>
+				</span>
+			</a>
+			<a class="member-link" href="sofiya.html">
+				<span class="member-link__row">
+					<span class="member-link__name">Со<em>фія</em></span>
+					<span class="member-link__meta mono">04 &nbsp;/&nbsp; Учасниця</span>
+				</span>
+			</a>
+			<a class="member-link" href="ivan.html">
+				<span class="member-link__row">
+					<span class="member-link__name">І<em>ван</em></span>
+					<span class="member-link__meta mono">05 &nbsp;/&nbsp; Учасник</span>
+				</span>
+			</a>
+			<a class="member-link" href="dmytro.html">
+				<span class="member-link__row">
+					<span class="member-link__name">Дми<em>тро</em></span>
+					<span class="member-link__meta mono">06 &nbsp;/&nbsp; Учасник</span>
+				</span>
+			</a>
+			<a class="member-link" href="mykyta.html">
+				<span class="member-link__row">
+					<span class="member-link__name">Ми<em>кита</em></span>
+					<span class="member-link__meta mono">07 &nbsp;/&nbsp; Учасник</span>
+				</span>
+			</a>
+		</section>
+
+		<section class="facts">
+			<p class="facts__intro" data-reveal>Про дисципліну, у межах якої зроблено цей проєкт.</p>
+			<div data-rise>
+				<div class="fact-row">
+					<span class="mono">Команда</span>
+					<span>SINGLETON</span>
+					<span class="mono">7 учасників</span>
+				</div>
+				<div class="fact-row">
+					<span class="mono">Курс</span>
+					<span>Розроблення застосунків з використанням Spring Framework</span>
+					<span class="mono">3 курс</span>
+				</div>
+				<div class="fact-row">
+					<span class="mono">Група</span>
+					<span>ІП-41</span>
+					<span class="mono">ФІОТ</span>
+				</div>
+				<div class="fact-row">
+					<span class="mono">Робота</span>
+					<span>Лабораторна №1 — перше знайомство зі Spring Framework</span>
+					<span class="mono">2026</span>
+				</div>
+				<div class="fact-row">
+					<span class="mono">Стек</span>
+					<span>Java 27 &middot; Spring Boot &middot; Maven &middot; Tomcat</span>
+					<span class="mono">Backend</span>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<footer class="site-footer" data-dark>
+		<span class="site-footer__label mono">Say hello</span>
+		<a class="site-footer__cta" href="#team">ПОГОВОРИМО?</a>
+		<div class="site-footer__bottom mono">
+			<span>Команда SINGLETON &middot; ІП-41</span>
+			<a href="/">На головну &rarr;</a>
+		</div>
+	</footer>
+
+	<script src="app.js"></script>
 </body>
 </html>
