@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${topic.title}">Тема</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5 mb-5">
+        <div class="mb-4">
+            <a href="/" class="btn btn-outline-secondary">&larr; Повернутися до списку тем</a>
+        </div>
+        
+        <!-- Заголовок темы -->
+        <div class="card mb-4 shadow-sm border-primary">
+            <div class="card-body">
+                <h1 class="card-title text-primary" th:text="${topic.title}"></h1>
+                <h6 class="card-subtitle mb-2 text-muted" th:text="'Автор теми: ' + ${topic.author}"></h6>
+            </div>
+        </div>
+
+        <h3 class="mb-3">Дописи</h3>
+        <div class="card mb-4 shadow-sm">
+            <ul class="list-group list-group-flush">
+                <li th:each="post : ${posts}" class="list-group-item">
+                    <strong class="text-primary" th:text="${post.author} + ':'"></strong>
+                    <span class="ms-2" th:text="${post.content}"></span>
+                </li>
+                
+                <li th:if="${posts.isEmpty()}" class="list-group-item text-muted text-center py-4">
+                    Поки що немає жодного допису. Будьте першим!
+                </li>
+            </ul>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Додати допис (Зареєстрований користувач)</h5>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/topic/{id}/post(id=${topic.id})}" method="post">
+                    <div class="mb-3">
+                        <label for="authorInput" class="form-label">Ваше ім'я</label>
+                        <input type="text" id="authorInput" name="author" class="form-control" placeholder="Введіть ім'я..." required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contentInput" class="form-label">Повідомлення</label>
+                        <textarea id="contentInput" name="content" class="form-control" placeholder="Напишіть щось..." required rows="4"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success px-4">Відправити</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

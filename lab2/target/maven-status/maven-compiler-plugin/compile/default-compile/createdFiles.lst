@@ -1,0 +1,9 @@
+com\example\lab2\services\ActionLogger.class
+com\example\lab2\services\ForumService.class
+com\example\lab2\Lab2Application.class
+com\example\lab2\repositories\PostRepository.class
+com\example\lab2\models\Topic.class
+com\example\lab2\repositories\TopicRepository.class
+com\example\lab2\models\Post.class
+com\example\lab2\services\ForumConfig.class
+com\example\lab2\controllers\ForumController.class
