@@ -1,9 +1,0 @@
-D:\Work\VS_poject\Spring\lab2\src\main\java\com\example\lab2\controllers\ForumController.java
-D:\Work\VS_poject\Spring\lab2\src\main\java\com\example\lab2\Lab2Application.java
-D:\Work\VS_poject\Spring\lab2\src\main\java\com\example\lab2\models\Post.java
-D:\Work\VS_poject\Spring\lab2\src\main\java\com\example\lab2\models\Topic.java
-D:\Work\VS_poject\Spring\lab2\src\main\java\com\example\lab2\repositories\PostRepository.java
-D:\Work\VS_poject\Spring\lab2\src\main\java\com\example\lab2\repositories\TopicRepository.java
-D:\Work\VS_poject\Spring\lab2\src\main\java\com\example\lab2\services\ActionLogger.java
-D:\Work\VS_poject\Spring\lab2\src\main\java\com\example\lab2\services\ForumConfig.java
-D:\Work\VS_poject\Spring\lab2\src\main\java\com\example\lab2\services\ForumService.java
