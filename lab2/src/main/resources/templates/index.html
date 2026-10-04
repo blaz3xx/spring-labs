@@ -1,63 +1,66 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Форум - Головна</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Форум</title>
+    <link rel="stylesheet" th:href="@{/css/forum.css}">
 </head>
-<body class="bg-light">
-    <div class="container mt-5">
-        <h1 class="text-primary mb-4">Форум (Варіант 4)</h1>
-
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-secondary text-white">
-                <h5 class="mb-0">Створення нової теми (Адміністратор)</h5>
-            </div>
-            <div class="card-body">
-                <form action="/topic/create" method="post" class="row g-3">
-                    <div class="col-md-5">
-                        <input type="text" name="title" class="form-control" placeholder="Назва теми" required>
-                    </div>
-                    <div class="col-md-5">
-                        <input type="text" name="author" class="form-control" placeholder="Ваше ім'я" required>
-                    </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-success w-100">Створити</button>
-                    </div>
-                </form>
-            </div>
+<body>
+    <header class="bar">
+        <div class="bar-in">
+            <a href="/" class="brand"><i></i>Форум</a>
+            <div class="spacer"></div>
+            <button type="button" id="toggle-new" class="btn">+ Нова тема</button>
         </div>
+    </header>
 
-        <h2 class="mb-3">Список тем</h2>
-        <div class="list-group shadow-sm">
-            <div th:each="topic : ${topics}" class="list-group-item">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div>
-                        <a th:href="@{/topic/{id}(id=${topic.id})}" th:text="${topic.title}" class="text-decoration-none fw-bold fs-5"></a>
-                        <span class="text-muted ms-2" th:text="'(Автор: ' + ${topic.author} + ')'"></span>
-                    </div>
-                    
-                    <form th:action="@{/topic/{id}/delete(id=${topic.id})}" method="post" class="m-0">
-                        <button type="submit" class="btn btn-outline-danger btn-sm">Видалити</button>
-                    </form>
+    <main class="wrap">
+        <div id="composer" class="composer">
+            <form action="/topic/create" method="post">
+                <div class="row">
+                    <input type="text" name="title" placeholder="Про що хочете поговорити?" required>
+                    <input type="text" name="author" data-remember placeholder="Ваше ім'я" required>
                 </div>
-                
-                <form th:action="@{/topic/{id}/edit(id=${topic.id})}" method="post" class="row g-2 align-items-center mt-2 border-top pt-2">
-                    <div class="col-auto">
-                        <span class="text-muted small">Редагувати:</span>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="text" name="title" class="form-control form-control-sm" th:value="${topic.title}" required>
-                    </div>
-                    <div class="col-md-3">
-                        <input type="text" name="author" class="form-control form-control-sm" th:value="${topic.author}" required>
-                    </div>
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-outline-secondary btn-sm">Зберегти</button>
-                    </div>
-                </form>
-            </div>
+                <div class="foot">
+                    <button type="button" id="cancel-new" class="btn ghost">Скасувати</button>
+                    <button type="submit" class="btn">Опублікувати</button>
+                </div>
+            </form>
         </div>
-    </div>
+
+        <div class="search">
+            <input type="search" id="q" placeholder="Пошук тем…" autocomplete="off">
+        </div>
+
+        <div class="list">
+            <div th:each="topic : ${topics}" class="row-topic">
+                <span class="ava" th:attr="data-name=${topic.author}"></span>
+                <div class="main">
+                    <a th:href="@{/topic/{id}(id=${topic.id})}" th:text="${topic.title}" class="title"></a>
+                    <div class="meta">автор <b th:text="${topic.author}"></b></div>
+                </div>
+
+                <details class="menu">
+                    <summary aria-label="Дії">&#8943;</summary>
+                    <div class="pop">
+                        <form th:action="@{/topic/{id}/edit(id=${topic.id})}" method="post">
+                            <input type="text" name="title" th:value="${topic.title}" required>
+                            <input type="text" name="author" th:value="${topic.author}" required>
+                            <button type="submit" class="btn">Зберегти</button>
+                        </form>
+                        <hr>
+                        <form th:action="@{/topic/{id}/delete(id=${topic.id})}" method="post">
+                            <button type="submit" class="btn danger">Видалити тему</button>
+                        </form>
+                    </div>
+                </details>
+            </div>
+
+            <div th:if="${topics.isEmpty()}" class="empty">Тем ще немає. Створіть першу.</div>
+        </div>
+    </main>
+
+    <script th:src="@{/js/forum.js}"></script>
 </body>
 </html>
