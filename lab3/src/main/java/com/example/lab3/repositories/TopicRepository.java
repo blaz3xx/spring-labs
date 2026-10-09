@@ -1,6 +1,7 @@
 package com.example.lab3.repositories;
 
 import com.example.lab3.models.Topic;
+import com.example.lab3.models.TopicCategory;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -14,8 +15,8 @@ public class TopicRepository {
     private final AtomicLong counter = new AtomicLong(1);
 
     public TopicRepository() {
-        save(new Topic(null, "Як швидко вивчити Spring Boot?", "Студент"));
-        save(new Topic(null, "Обговорення комп'ютерних ігор", "Гість"));
+        save(new Topic(null, "Як швидко вивчити Spring Boot?", "Студент", TopicCategory.STUDY));
+        save(new Topic(null, "Обговорення комп'ютерних ігор", "Гість", TopicCategory.GAMES));
     }
 
     public List<Topic> findAll() {

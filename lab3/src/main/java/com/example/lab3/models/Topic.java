@@ -6,16 +6,23 @@ public class Topic {
     private Long id;
     private String title;
     private String author;
+    private TopicCategory category;
     private LocalDateTime creationDate;
 
     public Topic() {
+        this.category = TopicCategory.OTHER;
         this.creationDate = LocalDateTime.now();
     }
 
     public Topic(Long id, String title, String author) {
+        this(id, title, author, TopicCategory.OTHER);
+    }
+
+    public Topic(Long id, String title, String author, TopicCategory category) {
         this.id = id;
         this.title = title;
         this.author = author;
+        this.category = category;
         this.creationDate = LocalDateTime.now();
     }
 
@@ -41,6 +48,14 @@ public class Topic {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public TopicCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(TopicCategory category) {
+        this.category = category;
     }
 
     public LocalDateTime getCreationDate() {
