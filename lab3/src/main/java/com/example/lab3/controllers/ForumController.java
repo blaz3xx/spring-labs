@@ -4,9 +4,11 @@ import com.example.lab3.models.Post;
 import com.example.lab3.models.Topic;
 import com.example.lab3.models.TopicCategory;
 import com.example.lab3.services.ForumService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 public class ForumController {
@@ -25,7 +27,11 @@ public class ForumController {
 
     @GetMapping("/topic/{id}")
     public String viewTopic(@PathVariable Long id, Model model) {
-        model.addAttribute("topic", forumService.getTopicById(id));
+        Topic topic = forumService.getTopicById(id);
+        if (topic == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Тему не знайдено");
+        }
+        model.addAttribute("topic", topic);
         model.addAttribute("posts", forumService.getPostsByTopic(id));
         return "topic";
     }

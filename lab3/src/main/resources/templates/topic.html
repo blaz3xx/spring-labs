@@ -24,11 +24,15 @@
             </div>
         </section>
 
+        <div class="count" th:unless="${posts.isEmpty()}">
+            Відповідей: <b th:text="${posts.size()}">0</b>
+        </div>
+
         <ol class="thread">
             <li th:each="post : ${posts}" class="msg">
                 <span class="ava sm" th:attr="data-name=${post.author}"></span>
                 <div class="body">
-                    <div class="who" th:text="${post.author}"></div>
+                    <div class="who" th:text="${post.author} ?: 'Анонім'"></div>
                     <p class="text" th:text="${post.content}"></p>
                 </div>
             </li>
@@ -39,8 +43,8 @@
 
     <div class="reply-bar">
         <form th:action="@{/topic/{id}/post(id=${topic.id})}" method="post">
-            <input type="text" name="author" data-remember placeholder="Ім'я" aria-label="Ім'я" required>
-            <textarea name="content" placeholder="Написати відповідь…" aria-label="Повідомлення" required></textarea>
+            <input type="text" name="author" data-remember placeholder="Ім'я" aria-label="Ім'я" required maxlength="50">
+            <textarea name="content" placeholder="Написати відповідь…" aria-label="Повідомлення" required maxlength="2000"></textarea>
             <button type="submit" class="btn">Надіслати</button>
         </form>
     </div>

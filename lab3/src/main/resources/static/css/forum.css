@@ -242,6 +242,15 @@ textarea { resize: vertical; }
 .msg .who { font-weight: 600; font-size: 0.875rem; }
 .msg .text { margin: 2px 0 0; white-space: pre-wrap; word-break: break-word; }
 
+.count {
+    padding: 16px 0 0;
+    color: var(--muted);
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    text-align: right;
+}
+.count b { color: var(--text); font-weight: 600; }
+
 /* ---------- sticky reply ---------- */
 .reply-bar {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
