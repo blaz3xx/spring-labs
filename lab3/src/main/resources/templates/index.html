@@ -7,60 +7,78 @@
     <link rel="stylesheet" th:href="@{/css/forum.css}">
 </head>
 <body>
-    <header class="bar">
-        <div class="bar-in">
-            <a href="/" class="brand"><i></i>Форум</a>
-            <div class="spacer"></div>
-            <button type="button" id="toggle-new" class="btn">+ Нова тема</button>
-        </div>
-    </header>
+<header class="bar">
+    <div class="bar-in">
+        <a href="/" class="brand"><i></i>Форум</a>
+        <div class="spacer"></div>
+        <button type="button" id="toggle-new" class="btn">+ Нова тема</button>
+    </div>
+</header>
 
-    <main class="wrap">
-        <div id="composer" class="composer">
-            <form action="/topic/create" method="post">
-                <div class="row">
-                    <input type="text" name="title" placeholder="Про що хочете поговорити?" required>
-                    <input type="text" name="author" data-remember placeholder="Ваше ім'я" required>
+<main class="wrap">
+    <div id="composer" class="composer">
+        <form action="/topic/create" method="post">
+            <div class="row with-category">
+                <input type="text" name="title" placeholder="Про що хочете поговорити?" required>
+                <input type="text" name="author" data-remember placeholder="Ваше ім'я" required>
+                <select name="category" aria-label="Категорія">
+                    <option th:each="c : ${categories}"
+                            th:value="${c.name()}"
+                            th:text="${c.label}">Категорія</option>
+                </select>
+            </div>
+            <div class="foot">
+                <button type="button" id="cancel-new" class="btn ghost">Скасувати</button>
+                <button type="submit" class="btn">Опублікувати</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="search">
+        <input type="search" id="q" placeholder="Пошук тем…" autocomplete="off">
+    </div>
+
+    <div class="list">
+        <div th:each="topic : ${topics}" class="row-topic">
+            <span class="ava" th:attr="data-name=${topic.author}"></span>
+            <div class="main">
+                <a th:href="@{/topic/{id}(id=${topic.id})}" th:text="${topic.title}" class="title"></a>
+                <div class="meta">автор <b th:text="${topic.author} ?: 'Анонім'"></b>
+                    <!-- th:switch / th:case: badge depends on the topic category -->
+                    <span th:switch="${topic.category.name()}">
+                            <span th:case="'STUDY'" class="cat cat-study">Навчання</span>
+                            <span th:case="'GAMES'" class="cat cat-games">Ігри</span>
+                            <span th:case="*" class="cat cat-other">Інше</span>
+                        </span>
                 </div>
-                <div class="foot">
-                    <button type="button" id="cancel-new" class="btn ghost">Скасувати</button>
-                    <button type="submit" class="btn">Опублікувати</button>
-                </div>
-            </form>
-        </div>
-
-        <div class="search">
-            <input type="search" id="q" placeholder="Пошук тем…" autocomplete="off">
-        </div>
-
-        <div class="list">
-            <div th:each="topic : ${topics}" class="row-topic">
-                <span class="ava" th:attr="data-name=${topic.author}"></span>
-                <div class="main">
-                    <a th:href="@{/topic/{id}(id=${topic.id})}" th:text="${topic.title}" class="title"></a>
-                    <div class="meta">автор <b th:text="${topic.author}"></b></div>
-                </div>
-
-                <details class="menu">
-                    <summary aria-label="Дії">&#8943;</summary>
-                    <div class="pop">
-                        <form th:action="@{/topic/{id}/edit(id=${topic.id})}" method="post">
-                            <input type="text" name="title" th:value="${topic.title}" required>
-                            <input type="text" name="author" th:value="${topic.author}" required>
-                            <button type="submit" class="btn">Зберегти</button>
-                        </form>
-                        <hr>
-                        <form th:action="@{/topic/{id}/delete(id=${topic.id})}" method="post">
-                            <button type="submit" class="btn danger">Видалити тему</button>
-                        </form>
-                    </div>
-                </details>
             </div>
 
-            <div th:if="${topics.isEmpty()}" class="empty">Тем ще немає. Створіть першу.</div>
+            <details class="menu">
+                <summary aria-label="Дії">&#8943;</summary>
+                <div class="pop">
+                    <form th:action="@{/topic/{id}/edit(id=${topic.id})}" method="post">
+                        <input type="text" name="title" th:value="${topic.title}" required>
+                        <input type="text" name="author" th:value="${topic.author}" required>
+                        <select name="category" aria-label="Категорія">
+                            <option th:each="c : ${categories}"
+                                    th:value="${c.name()}"
+                                    th:text="${c.label}"
+                                    th:selected="${c == topic.category}">Категорія</option>
+                        </select>
+                        <button type="submit" class="btn">Зберегти</button>
+                    </form>
+                    <hr>
+                    <form th:action="@{/topic/{id}/delete(id=${topic.id})}" method="post">
+                        <button type="submit" class="btn danger">Видалити тему</button>
+                    </form>
+                </div>
+            </details>
         </div>
-    </main>
 
-    <script th:src="@{/js/forum.js}"></script>
+        <div th:if="${topics.isEmpty()}" class="empty">Тем ще немає. Створіть першу.</div>
+    </div>
+</main>
+
+<script th:src="@{/js/forum.js}"></script>
 </body>
 </html>

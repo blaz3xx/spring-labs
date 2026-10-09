@@ -262,3 +262,41 @@ textarea { resize: vertical; }
     .reply-bar input { grid-column: 1 / -1; }
     .pop { width: min(280px, 80vw); }
 }
+
+/* Category select and badges */
+select {
+    width: 100%;
+    font: inherit;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px 12px;
+}
+select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--badge-bg);
+}
+
+@media (min-width: 601px) {
+    .composer .row.with-category { grid-template-columns: 1fr 160px 150px; }
+}
+
+.cat {
+    --h: 230;
+    display: inline-block;
+    margin-left: 8px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: hsl(var(--h) 45% 30%);
+    background: hsl(var(--h) 60% 91%);
+}
+@media (prefers-color-scheme: dark) {
+    .cat { color: hsl(var(--h) 70% 82%); background: hsl(var(--h) 25% 24%); }
+}
+.cat-study { --h: 150; }
+.cat-games { --h: 20; }
+.cat-other { --h: 230; }
