@@ -3,22 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Сторінку не знайдено</title>
+    <title>Сторінку не знайдено — Форум</title>
     <link rel="stylesheet" th:href="@{/css/forum.css}">
 </head>
 <body>
-<header class="bar">
-    <div class="bar-in">
-        <a href="/" class="brand"><i></i>Форум</a>
-    </div>
-</header>
+<div th:replace="~{fragments :: header(false)}"></div>
 
-<main class="wrap">
-    <div class="empty">
-        <h1>404</h1>
-        <p>Такої теми або сторінки не існує.</p>
-        <a href="/" class="btn">На головну</a>
-    </div>
+<main class="wrap status-page">
+    <p class="status-code">404</p>
+    <h1 class="display">Такої сторінки немає<span class="dot">.</span></h1>
+    <p class="lead">Можливо, тему вже видалили або в посиланні є помилка.</p>
+    <a th:href="@{/}" class="pill dark">До списку тем</a>
 </main>
+
+<div th:replace="~{fragments :: footer}"></div>
 </body>
 </html>

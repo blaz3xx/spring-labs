@@ -3,52 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title th:text="${topic.title}">Тема</title>
+    <title th:text="|${topic.title} — Форум|">Тема — Форум</title>
     <link rel="stylesheet" th:href="@{/css/forum.css}">
 </head>
 <body>
-    <header class="bar">
-        <div class="bar-in">
-            <a href="/" class="brand"><i></i>Форум</a>
-            <div class="crumb">/ <span th:text="${topic.title}"></span></div>
-        </div>
-    </header>
+<div th:replace="~{fragments :: header(false)}"></div>
 
-    <main class="wrap">
-        <section class="head">
-            <h1 th:text="${topic.title}"></h1>
-            <div class="by">
-                <span class="ava sm" th:attr="data-name=${topic.author}"></span>
-                <span th:text="${topic.author}"></span>
-                <span class="tag">автор теми</span>
+<main class="wrap narrow">
+    <article class="topic-head">
+        <div class="pills">
+            <span class="num" th:text="|№ ${#numbers.formatInteger(topic.id, 3)}|">№ 001</span>
+            <span th:switch="${topic.category.name()}">
+                <span th:case="'STUDY'" class="cat cat-study">Навчання</span>
+                <span th:case="'GAMES'" class="cat cat-games">Ігри</span>
+                <span th:case="*" class="cat cat-other">Інше</span>
+            </span>
+            <time th:attr="datetime=${#temporals.format(topic.creationDate, 'yyyy-MM-dd HH:mm:ss')}"
+                  th:text="${#temporals.format(topic.creationDate, 'dd.MM.yyyy HH:mm')}">01.01.2026 00:00</time>
+        </div>
+        <h1 class="display" th:text="${topic.title}">Назва теми</h1>
+        <p class="byline">Автор <b th:text="${topic.author} ?: 'Анонім'">Автор</b></p>
+    </article>
+
+    <h2 class="thread-title" th:unless="${posts.isEmpty()}">
+        Відповідей: <span th:text="${posts.size()}">0</span>
+    </h2>
+
+    <ol class="thread">
+        <li th:each="post, iter : ${posts}" class="post" th:id="|p${post.id}|">
+            <a class="post-no" th:href="|#p${post.id}|" th:text="|#${iter.count}|">#1</a>
+            <div class="post-body">
+                <p class="post-head">
+                    <b th:text="${post.author} ?: 'Анонім'">Автор</b>
+                    <time th:attr="datetime=${#temporals.format(post.creationDate, 'yyyy-MM-dd HH:mm:ss')}"
+                          th:text="${#temporals.format(post.creationDate, 'dd.MM.yyyy HH:mm')}">01.01.2026 00:00</time>
+                </p>
+                <p class="post-text" th:text="${post.content}">Текст допису</p>
             </div>
-        </section>
+        </li>
+    </ol>
 
-        <div class="count" th:unless="${posts.isEmpty()}">
-            Відповідей: <b th:text="${posts.size()}">0</b>
+    <p th:if="${posts.isEmpty()}" class="empty">Поки що тиша. Напишіть першу відповідь.</p>
+
+    <form class="reply" th:action="@{/topic/{id}/post(id=${topic.id})}" method="post">
+        <label class="field">
+            <span class="label">Ваша відповідь</span>
+            <textarea name="content" id="reply-text" rows="4" placeholder="Що думаєте?" required maxlength="2000"></textarea>
+        </label>
+        <div class="reply-foot">
+            <label class="field author-field">
+                <span class="sr-only">Ім'я</span>
+                <input type="text" name="author" data-remember placeholder="Ваше ім'я" required maxlength="50">
+            </label>
+            <span class="counter" id="reply-counter">0 / 2000</span>
+            <button type="submit" class="pill dark">Надіслати</button>
         </div>
+        <p class="hint"><kbd>Ctrl</kbd> + <kbd>Enter</kbd> надіслати</p>
+    </form>
+</main>
 
-        <ol class="thread">
-            <li th:each="post : ${posts}" class="msg">
-                <span class="ava sm" th:attr="data-name=${post.author}"></span>
-                <div class="body">
-                    <div class="who" th:text="${post.author} ?: 'Анонім'"></div>
-                    <p class="text" th:text="${post.content}"></p>
-                </div>
-            </li>
-        </ol>
+<div th:replace="~{fragments :: footer}"></div>
 
-        <div th:if="${posts.isEmpty()}" class="empty">Поки що немає жодного допису. Будьте першим!</div>
-    </main>
-
-    <div class="reply-bar">
-        <form th:action="@{/topic/{id}/post(id=${topic.id})}" method="post">
-            <input type="text" name="author" data-remember placeholder="Ім'я" aria-label="Ім'я" required maxlength="50">
-            <textarea name="content" placeholder="Написати відповідь…" aria-label="Повідомлення" required maxlength="2000"></textarea>
-            <button type="submit" class="btn">Надіслати</button>
-        </form>
-    </div>
-
-    <script th:src="@{/js/forum.js}"></script>
+<script th:src="@{/js/forum.js}"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-package com.example.lab3.config;
+package com.example.lab4.config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

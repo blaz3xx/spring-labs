@@ -1,4 +1,4 @@
-package com.example.lab3.services;
+package com.example.lab4.services;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package com.example.lab3.models;
+package com.example.lab4.models;
 
 import java.time.LocalDateTime;
 

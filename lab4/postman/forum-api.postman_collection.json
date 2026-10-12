@@ -1,0 +1,1065 @@
+{
+  "info": {
+    "name": "Forum REST API — Лабораторна робота №4",
+    "description": "Тести RESTful вебсервісу форуму на відповідність документації OpenAPI (/v3/api-docs). Запускайте папки по черзі через Collection Runner: запити використовують змінні topicId і postId, які заповнюються автоматично.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Теми: створення, читання, повне оновлення",
+      "item": [
+        {
+          "name": "Створити тему",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics"
+              ]
+            },
+            "description": "Очікується 201 Created, заголовок Location і створена тема в тілі.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Тема з Postman\",\n  \"author\": \"Артем\",\n  \"category\": \"STUDY\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 201 Created\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Є заголовок Location\", () => pm.response.to.have.header(\"Location\"));",
+                  "pm.test(\"Відповідь відповідає схемі TopicResponse\", () => pm.response.to.have.jsonSchema({\"type\":\"object\",\"required\":[\"id\",\"title\",\"author\",\"category\",\"createdAt\"],\"properties\":{\"id\":{\"type\":\"integer\"},\"title\":{\"type\":\"string\"},\"author\":{\"type\":\"string\"},\"category\":{\"type\":\"string\",\"enum\":[\"STUDY\",\"GAMES\",\"OTHER\"]},\"createdAt\":{\"type\":\"string\"}}}));",
+                  "const topic = pm.response.json();",
+                  "pm.test(\"Location вказує на створену тему\", () => pm.expect(pm.response.headers.get(\"Location\")).to.include(\"/api/topics/\" + topic.id));",
+                  "pm.collectionVariables.set(\"topicId\", topic.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Створити тему з некоректними даними",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics"
+              ]
+            },
+            "description": "Назва закоротка, автор порожній, категорії немає. Очікується 400 і перелік помилок за полями.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"abc\",\n  \"author\": \"\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400 Bad Request\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Відповідь відповідає схемі ProblemDetail\", () => pm.response.to.have.jsonSchema({\"type\":\"object\",\"required\":[\"status\",\"title\",\"detail\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"title\":{\"type\":\"string\"},\"detail\":{\"type\":\"string\"}}}));",
+                  "const errors = pm.response.json().errors;",
+                  "pm.test(\"Є помилки для title, author і category\", () => pm.expect(errors).to.have.all.keys(\"title\", \"author\", \"category\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Отримати тему за id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics/{{topicId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topicId}}"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Відповідь відповідає схемі TopicResponse\", () => pm.response.to.have.jsonSchema({\"type\":\"object\",\"required\":[\"id\",\"title\",\"author\",\"category\",\"createdAt\"],\"properties\":{\"id\":{\"type\":\"integer\"},\"title\":{\"type\":\"string\"},\"author\":{\"type\":\"string\"},\"category\":{\"type\":\"string\",\"enum\":[\"STUDY\",\"GAMES\",\"OTHER\"]},\"createdAt\":{\"type\":\"string\"}}}));",
+                  "pm.test(\"Повернуто саме ту тему\", () => pm.expect(pm.response.json().id).to.eql(Number(pm.collectionVariables.get(\"topicId\"))));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Отримати неіснуючу тему",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "999999"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 404 Not Found\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Відповідь відповідає схемі ProblemDetail\", () => pm.response.to.have.jsonSchema({\"type\":\"object\",\"required\":[\"status\",\"title\",\"detail\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"title\":{\"type\":\"string\"},\"detail\":{\"type\":\"string\"}}}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Повністю оновити тему (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics/{{topicId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topicId}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Тема оновлена через PUT\",\n  \"author\": \"Аня\",\n  \"category\": \"GAMES\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Відповідь відповідає схемі TopicResponse\", () => pm.response.to.have.jsonSchema({\"type\":\"object\",\"required\":[\"id\",\"title\",\"author\",\"category\",\"createdAt\"],\"properties\":{\"id\":{\"type\":\"integer\"},\"title\":{\"type\":\"string\"},\"author\":{\"type\":\"string\"},\"category\":{\"type\":\"string\",\"enum\":[\"STUDY\",\"GAMES\",\"OTHER\"]},\"createdAt\":{\"type\":\"string\"}}}));",
+                  "const topic = pm.response.json();",
+                  "pm.test(\"Усі поля замінено\", () => {",
+                  "    pm.expect(topic.title).to.eql(\"Тема оновлена через PUT\");",
+                  "    pm.expect(topic.author).to.eql(\"Аня\");",
+                  "    pm.expect(topic.category).to.eql(\"GAMES\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Повністю оновити неіснуючу тему",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "999999"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Назва неіснуючої теми\",\n  \"author\": \"Аня\",\n  \"category\": \"OTHER\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 404 Not Found\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Відповідь відповідає схемі ProblemDetail\", () => pm.response.to.have.jsonSchema({\"type\":\"object\",\"required\":[\"status\",\"title\",\"detail\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"title\":{\"type\":\"string\"},\"detail\":{\"type\":\"string\"}}}));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Фільтрація і пагінація",
+      "item": [
+        {
+          "name": "Перша сторінка з двох тем",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics?page=0&size=2",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "2"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Відповідь відповідає схемі PageResponse\", () => pm.response.to.have.jsonSchema({\"type\":\"object\",\"required\":[\"content\",\"page\",\"size\",\"totalElements\",\"totalPages\"],\"properties\":{\"content\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"id\",\"title\",\"author\",\"category\",\"createdAt\"],\"properties\":{\"id\":{\"type\":\"integer\"},\"title\":{\"type\":\"string\"},\"author\":{\"type\":\"string\"},\"category\":{\"type\":\"string\",\"enum\":[\"STUDY\",\"GAMES\",\"OTHER\"]},\"createdAt\":{\"type\":\"string\"}}}},\"page\":{\"type\":\"integer\"},\"size\":{\"type\":\"integer\"},\"totalElements\":{\"type\":\"integer\"},\"totalPages\":{\"type\":\"integer\"}}}));",
+                  "const page = pm.response.json();",
+                  "pm.test(\"На сторінці не більше 2 тем\", () => pm.expect(page.content.length).to.be.at.most(2));",
+                  "pm.test(\"Метадані пагінації узгоджені\", () => {",
+                  "    pm.expect(page.page).to.eql(0);",
+                  "    pm.expect(page.size).to.eql(2);",
+                  "    pm.expect(page.totalPages).to.eql(Math.ceil(page.totalElements / 2));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Фільтр за категорією",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics?category=STUDY",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "STUDY"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Усі теми мають категорію STUDY\", () => pm.response.json().content.forEach(t => pm.expect(t.category).to.eql(\"STUDY\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Пошук за частиною назви",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics?keyword=SPRING",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics"
+              ],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "SPRING"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200 OK\", () => pm.response.to.have.status(200));",
+                  "const page = pm.response.json();",
+                  "pm.test(\"Знайдено хоча б одну тему\", () => pm.expect(page.totalElements).to.be.above(0));",
+                  "pm.test(\"Кожна назва містить слово spring\", () => page.content.forEach(t => pm.expect(t.title.toLowerCase()).to.include(\"spring\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Некоректний номер сторінки",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics?page=-1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "-1"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400 Bad Request\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Відповідь відповідає схемі ProblemDetail\", () => pm.response.to.have.jsonSchema({\"type\":\"object\",\"required\":[\"status\",\"title\",\"detail\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"title\":{\"type\":\"string\"},\"detail\":{\"type\":\"string\"}}}));",
+                  "pm.test(\"Помилка стосується параметра page\", () => pm.expect(pm.response.json().errors).to.have.property(\"page\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Невідома категорія",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics?category=UNKNOWN",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "UNKNOWN"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400 Bad Request\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Відповідь відповідає схемі ProblemDetail\", () => pm.response.to.have.jsonSchema({\"type\":\"object\",\"required\":[\"status\",\"title\",\"detail\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"title\":{\"type\":\"string\"},\"detail\":{\"type\":\"string\"}}}));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Часткове оновлення (PATCH)",
+      "item": [
+        {
+          "name": "JSON Merge Patch (RFC 7386)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/merge-patch+json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics/{{topicId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topicId}}"
+              ]
+            },
+            "description": "Змінюється лише title, інші поля лишаються такими, як після PUT.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Назва змінена через Merge Patch\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Відповідь відповідає схемі TopicResponse\", () => pm.response.to.have.jsonSchema({\"type\":\"object\",\"required\":[\"id\",\"title\",\"author\",\"category\",\"createdAt\"],\"properties\":{\"id\":{\"type\":\"integer\"},\"title\":{\"type\":\"string\"},\"author\":{\"type\":\"string\"},\"category\":{\"type\":\"string\",\"enum\":[\"STUDY\",\"GAMES\",\"OTHER\"]},\"createdAt\":{\"type\":\"string\"}}}));",
+                  "const topic = pm.response.json();",
+                  "pm.test(\"Змінено лише назву\", () => {",
+                  "    pm.expect(topic.title).to.eql(\"Назва змінена через Merge Patch\");",
+                  "    pm.expect(topic.author).to.eql(\"Аня\");",
+                  "    pm.expect(topic.category).to.eql(\"GAMES\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "JSON Merge Patch з null для обов'язкового поля",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/merge-patch+json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics/{{topicId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topicId}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": null\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400 Bad Request\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Відповідь відповідає схемі ProblemDetail\", () => pm.response.to.have.jsonSchema({\"type\":\"object\",\"required\":[\"status\",\"title\",\"detail\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"title\":{\"type\":\"string\"},\"detail\":{\"type\":\"string\"}}}));",
+                  "pm.test(\"Помилка стосується поля category\", () => pm.expect(pm.response.json().errors).to.have.property(\"category\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "JSON Patch (RFC 6902)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json-patch+json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics/{{topicId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topicId}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"op\": \"test\",\n    \"path\": \"/author\",\n    \"value\": \"Аня\"\n  },\n  {\n    \"op\": \"replace\",\n    \"path\": \"/title\",\n    \"value\": \"Назва змінена через JSON Patch\"\n  },\n  {\n    \"op\": \"replace\",\n    \"path\": \"/category\",\n    \"value\": \"OTHER\"\n  }\n]"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Відповідь відповідає схемі TopicResponse\", () => pm.response.to.have.jsonSchema({\"type\":\"object\",\"required\":[\"id\",\"title\",\"author\",\"category\",\"createdAt\"],\"properties\":{\"id\":{\"type\":\"integer\"},\"title\":{\"type\":\"string\"},\"author\":{\"type\":\"string\"},\"category\":{\"type\":\"string\",\"enum\":[\"STUDY\",\"GAMES\",\"OTHER\"]},\"createdAt\":{\"type\":\"string\"}}}));",
+                  "const topic = pm.response.json();",
+                  "pm.test(\"Операції застосовано\", () => {",
+                  "    pm.expect(topic.title).to.eql(\"Назва змінена через JSON Patch\");",
+                  "    pm.expect(topic.category).to.eql(\"OTHER\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "JSON Patch з невдалою операцією test",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json-patch+json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics/{{topicId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topicId}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"op\": \"test\",\n    \"path\": \"/author\",\n    \"value\": \"Хтось інший\"\n  },\n  {\n    \"op\": \"replace\",\n    \"path\": \"/title\",\n    \"value\": \"Цього не має статися\"\n  }\n]"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400 Bad Request\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Відповідь відповідає схемі ProblemDetail\", () => pm.response.to.have.jsonSchema({\"type\":\"object\",\"required\":[\"status\",\"title\",\"detail\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"title\":{\"type\":\"string\"},\"detail\":{\"type\":\"string\"}}}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Тема не змінилась після невдалого patch",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics/{{topicId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topicId}}"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Назва лишилась попередньою\", () => pm.expect(pm.response.json().title).to.eql(\"Назва змінена через JSON Patch\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH з непідтримуваним Content-Type",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics/{{topicId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topicId}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Будь-яка назва теми\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 415 Unsupported Media Type\", () => pm.response.to.have.status(415));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Дописи",
+      "item": [
+        {
+          "name": "Додати допис до теми",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics/{{topicId}}/posts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topicId}}",
+                "posts"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"author\": \"Софія\",\n  \"content\": \"Допис, створений у Postman\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 201 Created\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Є заголовок Location\", () => pm.response.to.have.header(\"Location\"));",
+                  "pm.test(\"Відповідь відповідає схемі PostResponse\", () => pm.response.to.have.jsonSchema({\"type\":\"object\",\"required\":[\"id\",\"topicId\",\"author\",\"content\",\"createdAt\"],\"properties\":{\"id\":{\"type\":\"integer\"},\"topicId\":{\"type\":\"integer\"},\"author\":{\"type\":\"string\"},\"content\":{\"type\":\"string\"},\"createdAt\":{\"type\":\"string\"}}}));",
+                  "pm.collectionVariables.set(\"postId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Отримати дописи теми",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics/{{topicId}}/posts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topicId}}",
+                "posts"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Відповідь є масивом дописів\", () => pm.response.to.have.jsonSchema({\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"id\",\"topicId\",\"author\",\"content\",\"createdAt\"],\"properties\":{\"id\":{\"type\":\"integer\"},\"topicId\":{\"type\":\"integer\"},\"author\":{\"type\":\"string\"},\"content\":{\"type\":\"string\"},\"createdAt\":{\"type\":\"string\"}}}}));",
+                  "pm.test(\"Серед дописів є щойно створений\", () => pm.expect(pm.response.json().map(p => p.id)).to.include(Number(pm.collectionVariables.get(\"postId\"))));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Отримати допис за id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics/{{topicId}}/posts/{{postId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topicId}}",
+                "posts",
+                "{{postId}}"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Відповідь відповідає схемі PostResponse\", () => pm.response.to.have.jsonSchema({\"type\":\"object\",\"required\":[\"id\",\"topicId\",\"author\",\"content\",\"createdAt\"],\"properties\":{\"id\":{\"type\":\"integer\"},\"topicId\":{\"type\":\"integer\"},\"author\":{\"type\":\"string\"},\"content\":{\"type\":\"string\"},\"createdAt\":{\"type\":\"string\"}}}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Додати порожній допис",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics/{{topicId}}/posts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topicId}}",
+                "posts"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"author\": \"Софія\",\n  \"content\": \"\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400 Bad Request\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Відповідь відповідає схемі ProblemDetail\", () => pm.response.to.have.jsonSchema({\"type\":\"object\",\"required\":[\"status\",\"title\",\"detail\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"title\":{\"type\":\"string\"},\"detail\":{\"type\":\"string\"}}}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Додати допис до неіснуючої теми",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics/999999/posts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "999999",
+                "posts"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"author\": \"Софія\",\n  \"content\": \"Цей допис нікуди не потрапить\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 404 Not Found\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Відповідь відповідає схемі ProblemDetail\", () => pm.response.to.have.jsonSchema({\"type\":\"object\",\"required\":[\"status\",\"title\",\"detail\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"title\":{\"type\":\"string\"},\"detail\":{\"type\":\"string\"}}}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Видалити допис",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics/{{topicId}}/posts/{{postId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topicId}}",
+                "posts",
+                "{{postId}}"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 204 No Content\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Отримати видалений допис",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics/{{topicId}}/posts/{{postId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topicId}}",
+                "posts",
+                "{{postId}}"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 404 Not Found\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Відповідь відповідає схемі ProblemDetail\", () => pm.response.to.have.jsonSchema({\"type\":\"object\",\"required\":[\"status\",\"title\",\"detail\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"title\":{\"type\":\"string\"},\"detail\":{\"type\":\"string\"}}}));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Видалення теми",
+      "item": [
+        {
+          "name": "Видалити тему",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics/{{topicId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topicId}}"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 204 No Content\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Отримати видалену тему",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics/{{topicId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topicId}}"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 404 Not Found\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Відповідь відповідає схемі ProblemDetail\", () => pm.response.to.have.jsonSchema({\"type\":\"object\",\"required\":[\"status\",\"title\",\"detail\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"title\":{\"type\":\"string\"},\"detail\":{\"type\":\"string\"}}}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Видалити тему повторно",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/topics/{{topicId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topicId}}"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 404 Not Found\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Відповідь відповідає схемі ProblemDetail\", () => pm.response.to.have.jsonSchema({\"type\":\"object\",\"required\":[\"status\",\"title\",\"detail\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"title\":{\"type\":\"string\"},\"detail\":{\"type\":\"string\"}}}));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "topicId",
+      "value": ""
+    },
+    {
+      "key": "postId",
+      "value": ""
+    }
+  ]
+}

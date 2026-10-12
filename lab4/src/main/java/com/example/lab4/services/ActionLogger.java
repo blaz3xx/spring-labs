@@ -1,4 +1,4 @@
-package com.example.lab3.services;
+package com.example.lab4.services;
 
 import java.time.LocalDateTime;
 
@@ -10,6 +10,6 @@ public class ActionLogger {
     }
 
     public void log(String action) {
-        System.out.println("Дія: " + action + " | Логер створено о: " + createdTime);
+        System.out.println("Action: " + action + " | Logger created at: " + createdTime);
     }
 }
