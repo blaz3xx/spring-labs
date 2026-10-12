@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${topic.title}">Тема</title>
+    <link rel="stylesheet" th:href="@{/css/forum.css}">
+</head>
+<body>
+    <header class="bar">
+        <div class="bar-in">
+            <a href="/" class="brand"><i></i>Форум</a>
+            <div class="crumb">/ <span th:text="${topic.title}"></span></div>
+        </div>
+    </header>
+
+    <main class="wrap">
+        <section class="head">
+            <h1 th:text="${topic.title}"></h1>
+            <div class="by">
+                <span class="ava sm" th:attr="data-name=${topic.author}"></span>
+                <span th:text="${topic.author}"></span>
+                <span class="tag">автор теми</span>
+            </div>
+        </section>
+
+        <div class="count" th:unless="${posts.isEmpty()}">
+            Відповідей: <b th:text="${posts.size()}">0</b>
+        </div>
+
+        <ol class="thread">
+            <li th:each="post : ${posts}" class="msg">
+                <span class="ava sm" th:attr="data-name=${post.author}"></span>
+                <div class="body">
+                    <div class="who" th:text="${post.author} ?: 'Анонім'"></div>
+                    <p class="text" th:text="${post.content}"></p>
+                </div>
+            </li>
+        </ol>
+
+        <div th:if="${posts.isEmpty()}" class="empty">Поки що немає жодного допису. Будьте першим!</div>
+    </main>
+
+    <div class="reply-bar">
+        <form th:action="@{/topic/{id}/post(id=${topic.id})}" method="post">
+            <input type="text" name="author" data-remember placeholder="Ім'я" aria-label="Ім'я" required maxlength="50">
+            <textarea name="content" placeholder="Написати відповідь…" aria-label="Повідомлення" required maxlength="2000"></textarea>
+            <button type="submit" class="btn">Надіслати</button>
+        </form>
+    </div>
+
+    <script th:src="@{/js/forum.js}"></script>
+</body>
+</html>
