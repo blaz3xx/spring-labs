@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Форум</title>
+    <link rel="stylesheet" th:href="@{/css/forum.css}">
+</head>
+<body>
+<div th:replace="~{fragments :: header(true)}"></div>
+
+<main>
+    <section class="hero wrap">
+        <p class="kicker">Форум — ІП-41</p>
+        <h1 class="display">Говоримо<br>про код<span class="dot">.</span></h1>
+        <div class="hero-foot">
+            <p class="lead">Запитуйте, відповідайте й діліться знахідками. Усе, що ви бачите на сторінках, так само віддає REST API.</p>
+            <dl class="facts">
+                <div>
+                    <dt>Теми</dt>
+                    <dd th:text="${totalTopics}">0</dd>
+                </div>
+                <div>
+                    <dt>Відповіді</dt>
+                    <dd th:text="${totalReplies}">0</dd>
+                </div>
+            </dl>
+            <button type="button" class="pill dark" data-new aria-controls="composer" aria-expanded="false">Нова тема</button>
+        </div>
+    </section>
+
+    <section class="wrap">
+        <div id="composer" class="composer" hidden>
+            <form th:action="@{/topic/create}" method="post">
+                <label class="field">
+                    <span class="label">Тема</span>
+                    <input type="text" name="title" placeholder="Про що хочете поговорити?" required maxlength="100">
+                </label>
+                <div class="field-row">
+                    <label class="field">
+                        <span class="label">Автор</span>
+                        <input type="text" name="author" data-remember placeholder="Ваше ім'я" required maxlength="50">
+                    </label>
+                    <label class="field">
+                        <span class="label">Категорія</span>
+                        <select name="category">
+                            <option th:each="c : ${categories}"
+                                    th:value="${c.name()}"
+                                    th:text="${c.label}">Категорія</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="actions">
+                    <button type="button" id="cancel-new" class="pill outline">Скасувати</button>
+                    <button type="submit" class="pill dark">Опублікувати</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="toolbar">
+            <nav class="chips" aria-label="Категорії">
+                <a th:href="@{/}" class="chip" th:classappend="${activeCategory == null} ? 'on'">
+                    Усі <span class="count" th:text="${totalTopics}">0</span>
+                </a>
+                <a th:each="c : ${categories}"
+                   th:href="@{/(category=${c.name()})}"
+                   class="chip" th:classappend="${c == activeCategory} ? 'on'">
+                    <span th:text="${c.label}">Категорія</span>
+                    <span class="count" th:text="${categoryCounts.get(c)}">0</span>
+                </a>
+            </nav>
+            <form class="search" th:action="@{/}" method="get" role="search">
+                <input type="hidden" name="category" th:if="${activeCategory != null}" th:value="${activeCategory.name()}">
+                <label class="sr-only" for="q">Пошук тем</label>
+                <input type="search" id="q" name="q" th:value="${keyword}" placeholder="Пошук тем" autocomplete="off" maxlength="100">
+                <kbd>/</kbd>
+            </form>
+        </div>
+
+        <p class="results-note" th:if="${keyword != null}">
+            За запитом «<b th:text="${keyword}">слово</b>» знайдено <b th:text="${foundCount}">0</b>.
+            <a th:href="@{${resetHref}}">Скинути пошук</a>
+        </p>
+
+        <ol class="grid" id="topics">
+            <li th:each="topic : ${topics}" class="card">
+                <div class="card-top">
+                    <span class="num" th:text="|№ ${#numbers.formatInteger(topic.id, 3)}|">№ 001</span>
+                    <span th:switch="${topic.category.name()}">
+                        <span th:case="'STUDY'" class="cat cat-study">Навчання</span>
+                        <span th:case="'GAMES'" class="cat cat-games">Ігри</span>
+                        <span th:case="*" class="cat cat-other">Інше</span>
+                    </span>
+                </div>
+                <div class="card-body">
+                    <a class="card-title" th:href="@{/topic/{id}(id=${topic.id})}" th:text="${topic.title}">Назва теми</a>
+                    <p class="card-meta">
+                        <b th:text="${topic.author} ?: 'Анонім'">Автор</b>
+                        <time th:attr="datetime=${#temporals.format(topic.creationDate, 'yyyy-MM-dd HH:mm:ss')}"
+                              th:text="${#temporals.format(topic.creationDate, 'dd.MM.yyyy HH:mm')}">01.01.2026 00:00</time>
+                    </p>
+                </div>
+                <div class="card-foot">
+                    <p class="replies" th:with="replies=${replyCounts.getOrDefault(topic.id, 0L)}"
+                       th:classappend="${replies == 0} ? 'zero'">
+                        <b th:text="${replies}">0</b> відп.
+                    </p>
+                    <details class="menu">
+                        <summary>Змінити</summary>
+                        <div class="pop">
+                            <form th:action="@{/topic/{id}/edit(id=${topic.id})}" method="post">
+                                <label class="field">
+                                    <span class="label">Тема</span>
+                                    <input type="text" name="title" th:value="${topic.title}" required maxlength="100">
+                                </label>
+                                <label class="field">
+                                    <span class="label">Автор</span>
+                                    <input type="text" name="author" th:value="${topic.author}" required maxlength="50">
+                                </label>
+                                <label class="field">
+                                    <span class="label">Категорія</span>
+                                    <select name="category">
+                                        <option th:each="c : ${categories}"
+                                                th:value="${c.name()}"
+                                                th:text="${c.label}"
+                                                th:selected="${c == topic.category}">Категорія</option>
+                                    </select>
+                                </label>
+                                <button type="submit" class="pill dark">Зберегти</button>
+                            </form>
+                            <form th:action="@{/topic/{id}/delete(id=${topic.id})}" method="post" class="delete-form">
+                                <button type="submit" class="link-danger">Видалити тему</button>
+                            </form>
+                        </div>
+                    </details>
+                </div>
+            </li>
+        </ol>
+
+        <p th:if="${topics.isEmpty()}" class="empty"
+           th:text="${keyword != null} ? 'Нічого не знайдено за цим запитом.' : (${activeCategory != null} ? 'У цій категорії ще немає тем.' : 'Тем ще немає. Створіть першу.')">Тем ще немає.</p>
+
+        <nav class="pager" th:if="${totalPages > 1}" aria-label="Сторінки">
+            <a th:if="${prevHref != null}" th:href="@{${prevHref}}" class="pill outline" rel="prev">← Назад</a>
+            <span th:unless="${prevHref != null}" class="pill outline disabled" aria-disabled="true">← Назад</span>
+            <ol class="pages">
+                <li th:each="link : ${pageLinks}">
+                    <a th:if="${link.href != null}" th:href="@{${link.href}}" class="page"
+                       th:classappend="${link.current} ? 'on'"
+                       th:attr="aria-current=${link.current ? 'page' : null}"
+                       th:text="${link.label}">1</a>
+                    <span th:unless="${link.href != null}" class="gap" th:text="${link.label}">…</span>
+                </li>
+            </ol>
+            <a th:if="${nextHref != null}" th:href="@{${nextHref}}" class="pill outline" rel="next">Далі →</a>
+            <span th:unless="${nextHref != null}" class="pill outline disabled" aria-disabled="true">Далі →</span>
+        </nav>
+        <p class="pager-info" th:if="${totalPages > 1}">
+            Показано <b><span th:text="${from}">1</span>–<span th:text="${to}">12</span></b> з <b th:text="${foundCount}">18</b>
+        </p>
+    </section>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+
+<script th:src="@{/js/forum.js}"></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="|${topic.title} — Форум|">Тема — Форум</title>
+    <link rel="stylesheet" th:href="@{/css/forum.css}">
+</head>
+<body>
+<div th:replace="~{fragments :: header(false)}"></div>
+
+<main class="wrap narrow">
+    <article class="topic-head">
+        <div class="pills">
+            <span class="num" th:text="|№ ${#numbers.formatInteger(topic.id, 3)}|">№ 001</span>
+            <span th:switch="${topic.category.name()}">
+                <span th:case="'STUDY'" class="cat cat-study">Навчання</span>
+                <span th:case="'GAMES'" class="cat cat-games">Ігри</span>
+                <span th:case="*" class="cat cat-other">Інше</span>
+            </span>
+            <time th:attr="datetime=${#temporals.format(topic.creationDate, 'yyyy-MM-dd HH:mm:ss')}"
+                  th:text="${#temporals.format(topic.creationDate, 'dd.MM.yyyy HH:mm')}">01.01.2026 00:00</time>
+        </div>
+        <h1 class="display" th:text="${topic.title}">Назва теми</h1>
+        <p class="byline">Автор <b th:text="${topic.author} ?: 'Анонім'">Автор</b></p>
+    </article>
+
+    <h2 class="thread-title" th:unless="${posts.isEmpty()}">
+        Відповідей: <span th:text="${posts.size()}">0</span>
+    </h2>
+
+    <ol class="thread">
+        <li th:each="post, iter : ${posts}" class="post" th:id="|p${post.id}|">
+            <a class="post-no" th:href="|#p${post.id}|" th:text="|#${iter.count}|">#1</a>
+            <div class="post-body">
+                <p class="post-head">
+                    <b th:text="${post.author} ?: 'Анонім'">Автор</b>
+                    <time th:attr="datetime=${#temporals.format(post.creationDate, 'yyyy-MM-dd HH:mm:ss')}"
+                          th:text="${#temporals.format(post.creationDate, 'dd.MM.yyyy HH:mm')}">01.01.2026 00:00</time>
+                </p>
+                <p class="post-text" th:text="${post.content}">Текст допису</p>
+            </div>
+        </li>
+    </ol>
+
+    <p th:if="${posts.isEmpty()}" class="empty">Поки що тиша. Напишіть першу відповідь.</p>
+
+    <form class="reply" th:action="@{/topic/{id}/post(id=${topic.id})}" method="post">
+        <label class="field">
+            <span class="label">Ваша відповідь</span>
+            <textarea name="content" id="reply-text" rows="4" placeholder="Що думаєте?" required maxlength="2000"></textarea>
+        </label>
+        <div class="reply-foot">
+            <label class="field author-field">
+                <span class="sr-only">Ім'я</span>
+                <input type="text" name="author" data-remember placeholder="Ваше ім'я" required maxlength="50">
+            </label>
+            <span class="counter" id="reply-counter">0 / 2000</span>
+            <button type="submit" class="pill dark">Надіслати</button>
+        </div>
+        <p class="hint"><kbd>Ctrl</kbd> + <kbd>Enter</kbd> надіслати</p>
+    </form>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+
+<script th:src="@{/js/forum.js}"></script>
+</body>
+</html>
