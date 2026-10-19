@@ -2,7 +2,7 @@ package com.example.lab5.controllers;
 
 import com.example.lab5.dto.PostRequest;
 import com.example.lab5.dto.PostResponse;
-import com.example.lab5.services.PostServiceImpl;
+import com.example.lab5.services.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,9 +31,9 @@ import java.util.List;
 @Tag(name = "Дописи", description = "Перегляд, додавання та видалення дописів у темі")
 public class PostRestController {
 
-    private final PostServiceImpl postService;
+    private final PostService postService;
 
-    public PostRestController(PostServiceImpl postService) {
+    public PostRestController(PostService postService) {
         this.postService = postService;
     }
 

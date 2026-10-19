@@ -36,7 +36,6 @@ public class PostRepositoryImpl implements PostRepository {
         String sql = "INSERT INTO posts (topic_id, content, author) VALUES (?, ?, ?)";
         
         jdbcTemplate.update(connection -> {
-            // Явно указываем, что нам нужно вернуть только сгенерированный "id"
             PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
             ps.setLong(1, post.getTopicId());
             ps.setString(2, post.getContent());

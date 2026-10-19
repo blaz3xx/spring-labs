@@ -25,7 +25,7 @@ public class TopicRepositoryImpl implements TopicRepository {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcClient.sql("INSERT INTO topics (title, author, category) VALUES (:title, :author, :category)")
                 .param("title", topic.getTitle())
-                .param("author", topic.getAuthor()) // Тепер автор зберігається
+                .param("author", topic.getAuthor())
                 .param("category", topic.getCategory() != null ? topic.getCategory().name() : null)
                 .update(keyHolder, "id");
         return keyHolder.getKey().longValue();
@@ -44,7 +44,7 @@ public class TopicRepositoryImpl implements TopicRepository {
     public int update(Topic topic) {
         return jdbcClient.sql("UPDATE topics SET title = :title, author = :author, category = :category WHERE id = :id")
                 .param("title", topic.getTitle())
-                .param("author", topic.getAuthor()) // Тепер автор оновлюється
+                .param("author", topic.getAuthor())
                 .param("category", topic.getCategory() != null ? topic.getCategory().name() : null)
                 .param("id", topic.getId())
                 .update();
@@ -64,7 +64,6 @@ public class TopicRepositoryImpl implements TopicRepository {
 
     @Override
     public List<Topic> search(String keyword, TopicCategory category, String author) {
-        // Динамічний запит із захистом від null та обов'язковим ORDER BY
         return jdbcClient.sql("""
                 SELECT id, title, author, category, created_at AS creation_date
                 FROM topics

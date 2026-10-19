@@ -77,13 +77,13 @@ public class TopicServiceImpl implements TopicService {
     }
 
     
-    @Transactional 
+    @Transactional
     public void delete(Long id) {
         getTopic(id);
         postRepository.deleteByTopicId(id);
-        //if (true) { 
-        //throw new RuntimeException("Перевірка відкату транзакції!");
-        //}
+//        if (true) {
+//        throw new RuntimeException("Перевірка відкату транзакції!");
+//        }
         topicRepository.delete(id);
     }
 

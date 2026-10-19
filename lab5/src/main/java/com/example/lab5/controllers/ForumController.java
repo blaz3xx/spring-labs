@@ -5,7 +5,7 @@ import com.example.lab5.dto.PageResponse;
 import com.example.lab5.models.Post;
 import com.example.lab5.models.Topic;
 import com.example.lab5.models.TopicCategory;
-import com.example.lab5.services.ForumServiceImpl;
+import com.example.lab5.services.ForumService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,9 +22,9 @@ import java.util.function.Function;
 public class ForumController {
     private static final int PAGE_SIZE = 12;
 
-    private final ForumServiceImpl forumService;
+    private final ForumService forumService;
 
-    public ForumController(ForumServiceImpl forumService) {
+    public ForumController(ForumService forumService) {
         this.forumService = forumService;
     }
 

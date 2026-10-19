@@ -4,7 +4,7 @@ import com.example.lab5.dto.PageResponse;
 import com.example.lab5.dto.TopicRequest;
 import com.example.lab5.dto.TopicResponse;
 import com.example.lab5.models.TopicCategory;
-import com.example.lab5.services.TopicServiceImpl;
+import com.example.lab5.services.TopicService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -47,9 +47,9 @@ public class TopicRestController {
     public static final String MERGE_PATCH_JSON = "application/merge-patch+json";
     public static final String JSON_PATCH_JSON = "application/json-patch+json";
 
-    private final TopicServiceImpl topicService;
+    private final TopicService topicService;
 
-    public TopicRestController(TopicServiceImpl topicService) {
+    public TopicRestController(TopicService topicService) {
         this.topicService = topicService;
     }
 
