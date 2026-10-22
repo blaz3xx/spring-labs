@@ -33,7 +33,7 @@ document.querySelectorAll('input[name=author][data-remember]').forEach((input) =
     });
 });
 
-document.querySelectorAll('.card').forEach((card, i) => card.style.setProperty('--i', Math.min(i, 12)));
+document.querySelectorAll('.card, .post').forEach((el, i) => el.style.setProperty('--i', Math.min(i, 12)));
 
 const composer = document.getElementById('composer');
 const newButtons = document.querySelectorAll('[data-new]');
@@ -113,4 +113,66 @@ if (replyText) {
         }
     });
     update();
+}
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+const THEME_KEY = 'forum.theme';
+document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+    const sync = () => button.setAttribute('aria-pressed', String(document.documentElement.dataset.theme === 'dark'));
+    sync();
+    button.addEventListener('click', () => {
+        const root = document.documentElement;
+        const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        root.classList.add('theme-anim');
+        root.dataset.theme = next;
+        try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+        sync();
+        button.classList.toggle('spin');
+        setTimeout(() => root.classList.remove('theme-anim'), 400);
+    });
+});
+
+const header = document.querySelector('.site-header');
+const toTop = document.querySelector('[data-to-top]');
+let ticking = false;
+const onScroll = () => {
+    const y = window.scrollY;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    header?.classList.toggle('scrolled', y > 8);
+    header?.style.setProperty('--progress', max > 0 ? (y / max).toFixed(4) : 0);
+    toTop?.classList.toggle('show', y > 600);
+    ticking = false;
+};
+window.addEventListener('scroll', () => {
+    if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(onScroll);
+    }
+}, { passive: true });
+onScroll();
+toTop?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: reduceMotion.matches ? 'auto' : 'smooth' }));
+
+document.querySelectorAll('.card').forEach((card) => {
+    card.addEventListener('pointermove', (e) => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--mx', `${e.clientX - rect.left}px`);
+        card.style.setProperty('--my', `${e.clientY - rect.top}px`);
+    });
+});
+
+if (!reduceMotion.matches) {
+    document.querySelectorAll('.facts dd').forEach((el) => {
+        const target = Number(el.textContent.trim());
+        if (!Number.isFinite(target) || target <= 0) return;
+        const duration = 1100;
+        const start = performance.now() + 350;
+        el.textContent = '0';
+        const step = (now) => {
+            const t = Math.min(1, Math.max(0, (now - start) / duration));
+            el.textContent = String(Math.round(target * (1 - Math.pow(1 - t, 3))));
+            if (t < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+    });
 }

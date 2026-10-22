@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Помилка — Форум</title>
     <link rel="stylesheet" th:href="@{/css/forum.css}">
+    <script th:src="@{/js/theme.js}"></script>
 </head>
 <body>
 <div th:replace="~{fragments :: header(false)}"></div>
@@ -18,5 +19,7 @@
 </main>
 
 <div th:replace="~{fragments :: footer}"></div>
+
+<script th:src="@{/js/forum.js}"></script>
 </body>
 </html>

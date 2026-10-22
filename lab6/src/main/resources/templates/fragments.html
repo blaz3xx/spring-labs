@@ -14,11 +14,15 @@
                 <b>Київ, КПІ</b>
                 <span th:text="${#temporals.format(#temporals.createToday(), 'dd.MM.yyyy')}">01.01.2026</span>
             </p>
+            <button type="button" class="theme-toggle" data-theme-toggle aria-label="Перемкнути тему" title="Перемкнути тему">
+                <span class="theme-icon" aria-hidden="true"></span>
+            </button>
             <button th:if="${withNew}" type="button" class="pill dark" data-new
                     aria-controls="composer" aria-expanded="false">Нова тема</button>
             <a th:unless="${withNew}" th:href="@{/}" class="pill outline">До списку тем</a>
         </div>
     </div>
+    <div class="progress" aria-hidden="true"></div>
 </header>
 
 <footer class="site-footer" th:fragment="footer">
@@ -51,9 +55,10 @@
         </div>
         <div class="footer-bottom">
             <span>Команда SINGLETON · ІП-41 · КПІ ім. Ігоря Сікорського</span>
-            <span>Spring Boot · Thymeleaf</span>
+            <span>Spring Boot · Spring Data JPA · Thymeleaf</span>
         </div>
     </div>
+    <button type="button" class="to-top" data-to-top aria-label="Вгору" title="Вгору">↑</button>
 </footer>
 
 </body>
