@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Помилка — Форум</title>
+    <link rel="stylesheet" th:href="@{/css/forum.css}">
+</head>
+<body>
+<div th:replace="~{fragments :: header(false)}"></div>
+
+<main class="wrap status-page">
+    <p class="status-code" th:text="${status} ?: 'Помилка'">500</p>
+    <h1 class="display"
+        th:text="${status != null and status < 500} ? 'Запит не вдалося виконати' : 'Щось пішло не так'">Щось пішло не так</h1>
+    <p class="lead">Спробуйте повернутися на головну сторінку і повторити дію.</p>
+    <a th:href="@{/}" class="pill dark">До списку тем</a>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

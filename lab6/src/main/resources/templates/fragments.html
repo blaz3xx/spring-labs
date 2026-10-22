@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<header class="site-header" th:fragment="header(withNew)">
+    <div class="bar wrap">
+        <a th:href="@{/}" class="logo">Форум</a>
+        <nav class="main-nav" aria-label="Основна навігація">
+            <a th:href="@{/}">Теми</a>
+            <a th:href="@{/swagger-ui.html}">REST API</a>
+        </nav>
+        <div class="bar-aside">
+            <p class="where">
+                <b>Київ, КПІ</b>
+                <span th:text="${#temporals.format(#temporals.createToday(), 'dd.MM.yyyy')}">01.01.2026</span>
+            </p>
+            <button th:if="${withNew}" type="button" class="pill dark" data-new
+                    aria-controls="composer" aria-expanded="false">Нова тема</button>
+            <a th:unless="${withNew}" th:href="@{/}" class="pill outline">До списку тем</a>
+        </div>
+    </div>
+</header>
+
+<footer class="site-footer" th:fragment="footer">
+    <div class="wrap">
+        <div class="footer-main">
+            <div class="footer-brand">
+                <a th:href="@{/}" class="footer-logo">Форум<span>.</span></a>
+                <p>Навчальний проєкт з дисципліни «Розроблення застосунків з використанням Spring Framework».</p>
+            </div>
+            <nav class="footer-col" aria-label="Розділи">
+                <h2>Розділи</h2>
+                <a th:href="@{/}">Усі теми</a>
+                <a th:href="@{/(category=STUDY)}">Навчання</a>
+                <a th:href="@{/(category=GAMES)}">Ігри</a>
+                <a th:href="@{/(category=OTHER)}">Інше</a>
+            </nav>
+            <nav class="footer-col" aria-label="REST API">
+                <h2>REST API</h2>
+                <a th:href="@{/swagger-ui.html}">Swagger UI</a>
+                <a th:href="@{/v3/api-docs}">OpenAPI JSON</a>
+                <a th:href="@{/api/topics}">/api/topics</a>
+            </nav>
+            <div class="footer-col">
+                <h2>Клавіші</h2>
+                <p><kbd>j</kbd><kbd>k</kbd> вибір теми</p>
+                <p><kbd>Enter</kbd> відкрити</p>
+                <p><kbd>/</kbd> пошук</p>
+                <p><kbd>n</kbd> нова тема</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>Команда SINGLETON · ІП-41 · КПІ ім. Ігоря Сікорського</span>
+            <span>Spring Boot · Thymeleaf</span>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>
