@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Форум</title>
     <link rel="stylesheet" th:href="@{/css/forum.css}">
+    <script th:src="@{/js/theme.js}"></script>
 </head>
 <body>
 <div th:replace="~{fragments :: header(true)}"></div>
@@ -12,7 +13,10 @@
 <main>
     <section class="hero wrap">
         <p class="kicker">Форум — ІП-41</p>
-        <h1 class="display">Говоримо<br>про код<span class="dot">.</span></h1>
+        <h1 class="display reveal">
+            <span class="line"><span>Говоримо</span></span>
+            <span class="line"><span>про код<span class="dot">.</span></span></span>
+        </h1>
         <div class="hero-foot">
             <p class="lead">Запитуйте, відповідайте й діліться знахідками. Усе, що ви бачите на сторінках, так само віддає REST API.</p>
             <dl class="facts">
