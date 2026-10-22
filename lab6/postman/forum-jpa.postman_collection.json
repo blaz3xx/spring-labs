@@ -1,0 +1,290 @@
+{
+  "info": {
+    "name": "Forum Spring Data JPA — Лабораторна робота №6",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "suffix", "value": "" },
+    { "key": "topicId", "value": "" },
+    { "key": "sourceId", "value": "" },
+    { "key": "postId", "value": "" },
+    { "key": "topicsBefore", "value": "" }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.collectionVariables.get('suffix')) {",
+          "    pm.collectionVariables.set('suffix', Date.now().toString().slice(-6));",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "1. CRUD тем і дописів",
+      "item": [
+        {
+          "name": "Створити тему",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('201 Created', () => pm.response.to.have.status(201));",
+            "pm.test('Є заголовок Location', () => pm.response.to.have.header('Location'));",
+            "pm.collectionVariables.set('topicId', pm.response.json().id);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"title\": \"Тема Postman {{suffix}}\", \"author\": \"Артем\", \"category\": \"STUDY\"}" },
+            "url": "{{baseUrl}}/api/topics"
+          }
+        },
+        {
+          "name": "Створити тему з такою самою назвою (409)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('409 Conflict', () => pm.response.to.have.status(409));",
+            "pm.test('Формат Problem Details', () => pm.expect(pm.response.json().title).to.eql('Конфлікт даних'));"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"title\": \"Тема Postman {{suffix}}\", \"author\": \"Артем\", \"category\": \"STUDY\"}" },
+            "url": "{{baseUrl}}/api/topics"
+          }
+        },
+        {
+          "name": "Отримати тему за id",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('200 OK', () => pm.response.to.have.status(200));",
+            "pm.test('Та сама тема', () => pm.expect(pm.response.json().id).to.eql(Number(pm.collectionVariables.get('topicId'))));"
+          ] } }],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/topics/{{topicId}}" }
+        },
+        {
+          "name": "Повністю оновити тему (PUT)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('200 OK', () => pm.response.to.have.status(200));",
+            "pm.test('Категорію змінено', () => pm.expect(pm.response.json().category).to.eql('OTHER'));"
+          ] } }],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"title\": \"Тема Postman {{suffix}} (оновлена)\", \"author\": \"Артем\", \"category\": \"OTHER\"}" },
+            "url": "{{baseUrl}}/api/topics/{{topicId}}"
+          }
+        },
+        {
+          "name": "Додати допис до теми",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('201 Created', () => pm.response.to.have.status(201));",
+            "pm.collectionVariables.set('postId', pm.response.json().id);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"author\": \"Аня\", \"content\": \"Допис, створений з Postman {{suffix}}\"}" },
+            "url": "{{baseUrl}}/api/topics/{{topicId}}/posts"
+          }
+        },
+        {
+          "name": "Отримати неіснуючу тему (404)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('404 Not Found', () => pm.response.to.have.status(404));"
+          ] } }],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/topics/999999" }
+        }
+      ]
+    },
+    {
+      "name": "2. Запити JPQL та методи за назвою",
+      "item": [
+        {
+          "name": "Пошук і фільтрація (@Query)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('200 OK', () => pm.response.to.have.status(200));",
+            "pm.test('Лише теми STUDY', () => pm.response.json().content.forEach(t => pm.expect(t.category).to.eql('STUDY')));"
+          ] } }],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/topics?keyword=spring&category=STUDY&size=5" }
+        },
+        {
+          "name": "Статистика за категоріями (@Query з GROUP BY)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('200 OK', () => pm.response.to.have.status(200));",
+            "pm.test('Є кількість тем', () => pm.expect(pm.response.json()[0]).to.have.property('topics'));"
+          ] } }],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/topics/stats/categories" }
+        },
+        {
+          "name": "Популярні теми (@NamedQuery)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('200 OK', () => pm.response.to.have.status(200));",
+            "pm.test('У кожній щонайменше 3 дописи', () => pm.response.json().forEach(t => pm.expect(t.posts).to.be.at.least(3)));"
+          ] } }],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/topics/popular?minPosts=3" }
+        },
+        {
+          "name": "Популярні теми з від'ємним minPosts (400)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('400 Bad Request', () => pm.response.to.have.status(400));"
+          ] } }],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/topics/popular?minPosts=-1" }
+        },
+        {
+          "name": "Найновіші теми (findTop5ByOrderByCreationDateDesc)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('200 OK', () => pm.response.to.have.status(200));",
+            "pm.test('Не більше 5 тем', () => pm.expect(pm.response.json().length).to.be.at.most(5));"
+          ] } }],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/topics/latest" }
+        },
+        {
+          "name": "Теми автора (findByAuthorIgnoreCase...)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('200 OK', () => pm.response.to.have.status(200));",
+            "pm.test('Автор збігається без урахування регістру', () => pm.response.json().forEach(t => pm.expect(t.author.toLowerCase()).to.eql('аня')));"
+          ] } }],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/topics/by-author/аня" }
+        },
+        {
+          "name": "Пошук дописів за текстом (@Query з LIKE)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('200 OK', () => pm.response.to.have.status(200));",
+            "pm.test('Текст містить spring', () => pm.response.json().forEach(p => pm.expect(p.content.toLowerCase()).to.include('spring')));"
+          ] } }],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/posts/search?text=spring" }
+        },
+        {
+          "name": "Дописи автора (findByAuthorIgnoreCase...)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('200 OK', () => pm.response.to.have.status(200));"
+          ] } }],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/posts?author=Аня" }
+        }
+      ]
+    },
+    {
+      "name": "3. Транзакції",
+      "item": [
+        {
+          "name": "Кількість тем до пакетного створення",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.collectionVariables.set('topicsBefore', pm.response.json().totalElements);"
+          ] } }],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/topics?size=1" }
+        },
+        {
+          "name": "Пакетне створення без помилок",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('201 Created', () => pm.response.to.have.status(201));",
+            "pm.test('Створено 2 теми', () => pm.expect(pm.response.json().length).to.eql(2));"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "[{\"title\": \"Пакет {{suffix}} — перша\", \"author\": \"Артем\", \"category\": \"STUDY\"}, {\"title\": \"Пакет {{suffix}} — друга\", \"author\": \"Артем\", \"category\": \"OTHER\"}]" },
+            "url": "{{baseUrl}}/api/topics/batch"
+          }
+        },
+        {
+          "name": "Пакетне створення з помилкою (відкат)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('409 Conflict', () => pm.response.to.have.status(409));"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "[{\"title\": \"Пакет {{suffix}} — має відкотитись\", \"author\": \"Артем\", \"category\": \"STUDY\"}, {\"title\": \"Пакет {{suffix}} — перша\", \"author\": \"Артем\", \"category\": \"GAMES\"}]" },
+            "url": "{{baseUrl}}/api/topics/batch"
+          }
+        },
+        {
+          "name": "Перевірка: після відкату додались лише 2 теми",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "const before = Number(pm.collectionVariables.get('topicsBefore'));",
+            "pm.test('Кількість тем збільшилась рівно на 2', () => pm.expect(pm.response.json().totalElements).to.eql(before + 2));"
+          ] } }],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/topics?size=1" }
+        },
+        {
+          "name": "Перевірка: тема з відкоченого пакета відсутня",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Не знайдено жодної теми', () => pm.expect(pm.response.json().totalElements).to.eql(0));"
+          ] } }],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/topics?keyword=має відкотитись" }
+        },
+        {
+          "name": "Створити тему-джерело для об'єднання",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('201 Created', () => pm.response.to.have.status(201));",
+            "pm.collectionVariables.set('sourceId', pm.response.json().id);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"title\": \"Тема-джерело {{suffix}}\", \"author\": \"Артем\", \"category\": \"OTHER\"}" },
+            "url": "{{baseUrl}}/api/topics"
+          }
+        },
+        {
+          "name": "Допис у темі-джерелі",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('201 Created', () => pm.response.to.have.status(201));"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"author\": \"Аня\", \"content\": \"Цей допис буде перенесено\"}" },
+            "url": "{{baseUrl}}/api/topics/{{sourceId}}/posts"
+          }
+        },
+        {
+          "name": "Об'єднання з неіснуючою темою (404, без змін)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('404 Not Found', () => pm.response.to.have.status(404));"
+          ] } }],
+          "request": { "method": "POST", "url": "{{baseUrl}}/api/topics/{{sourceId}}/merge?targetId=999999" }
+        },
+        {
+          "name": "Перевірка: тема-джерело та її допис на місці",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('200 OK', () => pm.response.to.have.status(200));",
+            "pm.test('Допис лишився в темі', () => pm.expect(pm.response.json().length).to.eql(1));"
+          ] } }],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/topics/{{sourceId}}/posts" }
+        },
+        {
+          "name": "Об'єднати теми",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('200 OK', () => pm.response.to.have.status(200));",
+            "pm.test('Перенесено 1 допис', () => pm.expect(pm.response.json().movedPosts).to.eql(1));"
+          ] } }],
+          "request": { "method": "POST", "url": "{{baseUrl}}/api/topics/{{sourceId}}/merge?targetId={{topicId}}" }
+        },
+        {
+          "name": "Перевірка: тему-джерело видалено",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('404 Not Found', () => pm.response.to.have.status(404));"
+          ] } }],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/topics/{{sourceId}}" }
+        },
+        {
+          "name": "Перевірка: дописи в цільовій темі",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('2 дописи', () => pm.expect(pm.response.json().length).to.eql(2));"
+          ] } }],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/topics/{{topicId}}/posts" }
+        },
+        {
+          "name": "Видалити тему разом з дописами",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('204 No Content', () => pm.response.to.have.status(204));"
+          ] } }],
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/api/topics/{{topicId}}" }
+        }
+      ]
+    }
+  ]
+}
